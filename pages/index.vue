@@ -112,7 +112,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { fetchUserAttributes } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
@@ -134,7 +133,7 @@ const addTodo = async () => {
   isAdding.value = true;
   const { errors, data: newTodo } = await client.models.Todo.create({
     content: content.value,
-    userId: user.value.userId,
+    userId: user.value.sub,
   });
   content.value = "";
   if (!errors) {
@@ -176,46 +175,26 @@ const editTodo = async (todo: Schema["Todo"]) => {
 };
 
 // check if user is authenticated
-const { data } = await useFetch("/api/current-user");
-if (data && data._rawValue) {
-  user.value = data._rawValue;
-} else {
-  user.value = null;
-}
-
 try {
   if (process.client) {
     const userAttributes = await fetchUserAttributes();
-    console.log("userAttributes", userAttributes);
     user.value = userAttributes;
 
-    const { data: todos } = await client.models.Todo.list({
-      filter: {
-        userId: {
-          eq: user.value?.userId,
+    if (user.value) {
+      const { data: todos } = await client.models.Todo.list({
+        filter: {
+          userId: {
+            eq: user.value.sub,
+          },
         },
-      },
-    });
-    todoList.value = todos;
-    isLoading.value = false;
+      });
+      todoList.value = todos;
+      isLoading.value = false;
+    } else {
+      isLoading.value = false;
+    }
   }
 } catch (err) {
   // console.log(err)
-}
-
-if (process.client) {
-  if (user.value) {
-    const { data: todos } = await client.models.Todo.list({
-      filter: {
-        userId: {
-          eq: user.value?.userId,
-        },
-      },
-    });
-    todoList.value = todos;
-    isLoading.value = false;
-  } else {
-    isLoading.value = false;
-  }
 }
 </script>

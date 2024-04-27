@@ -13,28 +13,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { Hub } from "aws-amplify/utils";
 import { signOut } from "aws-amplify/auth";
 import { fetchUserAttributes } from "aws-amplify/auth";
 
-// defind states
-const user = ref(null);
+// define states
+const user = ref(false);
 
 // check if user is authenticated
-const { data } = await useFetch("/api/current-user");
-if (data && data._rawValue) {
-  user.value = data._rawValue;
-  console.log("user.value", user.value);
-} else {
-  user.value = null;
-}
-
 try {
   if (process.client) {
     const userAttributes = await fetchUserAttributes();
-    console.log("userAttributes", userAttributes);
-    user.value = userAttributes;
+    if (userAttributes) {
+      user.value = true;
+    }
   }
 } catch (err) {
   // console.log(err)
