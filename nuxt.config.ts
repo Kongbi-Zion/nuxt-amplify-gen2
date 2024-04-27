@@ -8,4 +8,12 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  alias: {
+    "./runtimeConfig": "./runtimeConfig.browser",
+  },
+  vite: {
+    define: {
+      "window.global": {},
+    },
+  },
 });
