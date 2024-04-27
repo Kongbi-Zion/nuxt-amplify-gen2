@@ -34,6 +34,7 @@ try {
   if (process.client) {
     const userAttributes = await fetchUserAttributes();
     console.log("userAttributes", userAttributes);
+    user.value = userAttributes;
   }
 } catch (err) {
   // console.log(err)

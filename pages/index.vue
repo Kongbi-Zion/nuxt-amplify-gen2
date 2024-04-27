@@ -113,6 +113,7 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { fetchUserAttributes } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import Todo from "~/components/Todo.vue";
@@ -180,6 +181,16 @@ if (data && data._rawValue) {
   user.value = data._rawValue;
 } else {
   user.value = null;
+}
+
+try {
+  if (process.client) {
+    const userAttributes = await fetchUserAttributes();
+    console.log("userAttributes", userAttributes);
+    user.value = userAttributes;
+  }
+} catch (err) {
+  // console.log(err)
 }
 
 if (process.client) {
