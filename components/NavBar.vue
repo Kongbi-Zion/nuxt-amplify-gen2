@@ -24,6 +24,7 @@ const user = ref(null);
 const { data } = await useFetch("/api/current-user");
 if (data && data._rawValue) {
   user.value = data._rawValue;
+  console.log("user.value", user.value);
 } else {
   user.value = null;
 }
