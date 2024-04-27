@@ -1,14 +1,46 @@
 <template>
   <li class="flex items-center justify-between">
     <div class="font-semibold border w-full rounded px-4 py-2.5">
-      {{ todo.content }}
+      {{ todoElement.content }}
     </div>
     <div class="min-w-[6rem]">
       <button
         type="submit"
         class="inline-flex font-bold items-center py-2.5 px-3 ms-2 text-sm text-white rounded-lg border focus:outline-none bg-[#047D95]"
+        :disabled="editing"
+        @click="
+          () => {
+            editing = true;
+            $emit('editTodo', todoElement);
+          }
+        "
       >
         <svg
+          v-if="editing"
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"
+            opacity=".25"
+          />
+          <path
+            fill="currentColor"
+            d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z"
+          >
+            <animateTransform
+              attributeName="transform"
+              dur="0.75s"
+              repeatCount="indefinite"
+              type="rotate"
+              values="0 12 12;360 12 12"
+            />
+          </path>
+        </svg>
+        <svg
+          v-else
           xmlns="http://www.w3.org/2000/svg"
           class="w-4 h-4"
           viewBox="0 0 24 24"
@@ -22,8 +54,40 @@
       <button
         type="submit"
         class="inline-flex font-bold items-center py-2.5 px-3 ms-1 text-sm text-white rounded-lg border focus:outline-none bg-red-500"
+        :disabled="deleting"
+        @click="
+          () => {
+            deleting = true;
+            $emit('deletedTodo', todoElement.id);
+          }
+        "
       >
         <svg
+          v-if="deleting"
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"
+            opacity=".25"
+          />
+          <path
+            fill="currentColor"
+            d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z"
+          >
+            <animateTransform
+              attributeName="transform"
+              dur="0.75s"
+              repeatCount="indefinite"
+              type="rotate"
+              values="0 12 12;360 12 12"
+            />
+          </path>
+        </svg>
+        <svg
+          v-else
           xmlns="http://www.w3.org/2000/svg"
           class="w-4 h-4"
           viewBox="0 0 24 24"
@@ -39,10 +103,48 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "@/amplify/data/resource";
+
+// generate your data client using the Schema from your backend
+const client = generateClient<Schema>();
+
+const deleting = ref(false);
+const editing = ref(false);
+const todoElement = ref<Schema["Todo"]>({
+  id: "",
+  content: "",
+});
+
+// defining props
 const props = defineProps({
   todo: {
     type: Object,
     required: true,
   },
 });
+const { todo } = props;
+
+onMounted(() => {
+  todoElement.value = {
+    id: todo.id,
+    content: todo.content,
+  };
+});
+
+const updateSub = client.models.Todo.onUpdate().subscribe({
+  next: (data) => {
+    if (todo.id == data.id) {
+      todoElement.value = {
+        id: data.id,
+        content: data.content,
+      };
+    }
+    editing.value = false;
+  },
+});
+
+//defining emits
+defineEmits(["editTodo", "deletedTodo"]);
 </script>
