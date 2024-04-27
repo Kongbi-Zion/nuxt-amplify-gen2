@@ -16,6 +16,7 @@
 import { onMounted } from "vue";
 import { Hub } from "aws-amplify/utils";
 import { signOut } from "aws-amplify/auth";
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 // defind states
 const user = ref(null);
@@ -27,6 +28,15 @@ if (data && data._rawValue) {
   console.log("user.value", user.value);
 } else {
   user.value = null;
+}
+
+try {
+  if (process.client) {
+    const userAttributes = await fetchUserAttributes();
+    console.log("userAttributes", userAttributes);
+  }
+} catch (err) {
+  // console.log(err)
 }
 
 // listen to auth events
