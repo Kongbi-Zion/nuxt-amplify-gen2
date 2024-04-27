@@ -188,6 +188,16 @@ try {
     const userAttributes = await fetchUserAttributes();
     console.log("userAttributes", userAttributes);
     user.value = userAttributes;
+
+    const { data: todos } = await client.models.Todo.list({
+      filter: {
+        userId: {
+          eq: user.value?.userId,
+        },
+      },
+    });
+    todoList.value = todos;
+    isLoading.value = false;
   }
 } catch (err) {
   // console.log(err)
