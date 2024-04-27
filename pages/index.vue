@@ -4,7 +4,9 @@
       <div class="w-full p-5 border shadow-lg rounded-lg min-h-40">
         <p class="text-center font-bold text-xl mb-6 mt-2">Todo List</p>
 
-        <p v-if="!user" class="text-center">Opps please signIn!</p>
+        <p v-if="!user && !isLoading" class="text-center">
+          Opps please signIn!
+        </p>
 
         <div v-else class="w-full max-w-lg mx-auto">
           <div class="flex items-center">
