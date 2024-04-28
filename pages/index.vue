@@ -163,7 +163,7 @@ const deleteTodo = async (todoId: string) => {
 const editTodo = async (todo: Schema["Todo"]) => {
   const { data: updatedTodo, errors } = await client.models.Todo.update({
     id: todo.id,
-    content: window.prompt("title", todo.content),
+    content: window.prompt("title", todo.content as string),
   });
 
   if (!errors) {
