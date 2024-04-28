@@ -122,9 +122,16 @@ import Todo from "~/components/Todo.vue";
 // generate your data client using the Schema from your backend
 const client = generateClient<Schema>();
 
-// defind states
-const user = ref<any>(null);
-const todoList = ref<any>([]);
+// defining types
+interface UserAttr {
+  sub?: string | undefined;
+  email_verified?: string | undefined;
+  email?: string | undefined;
+}
+
+// defining states
+const user = ref<UserAttr | null>(null);
+const todoList = ref<Schema["Todo"][]>([]);
 const content = ref("");
 const isLoading = ref(true);
 const isAdding = ref(false);

@@ -17,7 +17,7 @@ import { Hub } from "aws-amplify/utils";
 import { signOut } from "aws-amplify/auth";
 import { fetchUserAttributes } from "aws-amplify/auth";
 
-// define states
+// defining states
 const user = ref(false);
 
 // check if user is authenticated

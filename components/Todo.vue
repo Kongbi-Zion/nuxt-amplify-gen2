@@ -103,19 +103,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 
 // generate your data client using the Schema from your backend
 const client = generateClient<Schema>();
 
-const deleting = ref(false);
-const editing = ref(false);
-const todoElement = ref<Schema["Todo"]>({
-  id: "",
-  content: "",
-});
+// defining types
+interface TodoAttr {
+  id: string;
+  content: any;
+  createdAt: string;
+  updatedAt: string;
+  userId: any;
+}
 
 // defining props
 const props = defineProps({
@@ -126,19 +127,26 @@ const props = defineProps({
 });
 const { todo } = props;
 
-onMounted(() => {
-  todoElement.value = {
-    id: todo.id,
-    content: todo.content,
-  };
+// defining states
+const deleting = ref(false);
+const editing = ref(false);
+const todoElement = ref<TodoAttr>({
+  id: todo.id,
+  content: todo.content,
+  createdAt: todo.content,
+  updatedAt: todo.updatedAt,
+  userId: todo.userId,
 });
 
-const updateSub = client.models.Todo.onUpdate().subscribe({
+client.models.Todo.onUpdate().subscribe({
   next: (data) => {
     if (todo.id == data.id) {
       todoElement.value = {
         id: data.id,
         content: data.content,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        userId: data.userId,
       };
     }
     editing.value = false;
