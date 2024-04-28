@@ -5,7 +5,7 @@
         <p class="text-center font-bold text-xl mb-6 mt-2">Todo List</p>
 
         <p v-if="!user && !isLoading" class="text-center">
-          Opps please signIn!
+          Opps please Sign In!
         </p>
 
         <div v-else class="w-full max-w-lg mx-auto">
@@ -192,11 +192,9 @@ try {
       });
       todoList.value = todos;
       isLoading.value = false;
-    } else {
-      isLoading.value = false;
     }
   }
 } catch (err) {
-  // console.log(err)
+  isLoading.value = false;
 }
 </script>
